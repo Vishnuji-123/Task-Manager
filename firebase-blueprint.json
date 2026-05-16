@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A registered user in the system.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "The user's email address" },
+        "name": { "type": "string", "description": "The user's full name" },
+        "role": { "type": "string", "enum": ["admin", "member", "unassigned"], "description": "The selected role" },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "name", "role", "createdAt"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A workspace for a team.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "ownerId", "createdAt", "updatedAt"]
+    },
+    "ProjectMember": {
+      "title": "Project Member",
+      "description": "Membership of a user in a project.",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["admin", "member"] },
+        "userId": { "type": "string" },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["role", "userId", "joinedAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A task within a project.",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["To Do", "In Progress", "Done"] },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High", "Urgent"] },
+        "assigneeId": { "type": "string" },
+        "creatorId": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "title", "status", "priority", "creatorId", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Projects"
+    },
+    "/projects/{projectId}/members/{memberId}": {
+      "schema": { "$ref": "#/entities/ProjectMember" },
+      "description": "Members of a project. memberId is userId."
+    },
+    "/projects/{projectId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "Tasks in a project"
+    }
+  }
+}

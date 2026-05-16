@@ -1,0 +1,174 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- PRIMITIVES & HELPERS ---
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isEtharaUser() { 
+      return request.auth != null && (request.auth.token.email.matches('.*@ethara\\.ai$') || request.auth.token.email.matches('.*@gmail\\.com$')); 
+    }
+
+    // Role lookups
+    function getMyProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function isSystemAdmin() {
+      return isEtharaUser() && getMyProfile().get('role', 'member') == 'admin';
+    }
+    function isProjectMember(projectId) {
+      return isEtharaUser() && getMyProfile().get('assignedProjectId', '') == projectId;
+    }
+
+    // --- VALIDATION BLUEPRINTS ---
+    function isValidUser(data) {
+      return data.size() >= 4 && data.size() <= 8
+        && data.email is string && data.email.size() >= 5 && data.email.size() <= 100
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.role in ['admin', 'member', 'unassigned']
+        && (!('assignedProjectId' in data) || data.assignedProjectId == null || (data.assignedProjectId is string && data.assignedProjectId.size() <= 128))
+        && data.createdAt is timestamp;
+    }
+
+    function isValidProject(data) {
+      return data.size() >= 4 && data.size() <= 5
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 100
+        && data.description is string
+        && data.ownerId is string && data.ownerId.size() > 0 && data.ownerId.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTeam(data) {
+      return data.size() >= 4 && data.size() <= 5
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 100
+        && data.description is string
+        && data.projectId is string && data.projectId.size() > 0 && data.projectId.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTeamMember(data) {
+      return data.size() == 3
+        && data.role in ['admin', 'Tasker', 'QR', 'QL', 'PL']
+        && data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128
+        && data.joinedAt is timestamp;
+    }
+
+    function isValidTask(data) {
+      return data.projectId is string
+        && data.title is string
+        && data.status in ['To Do', 'In Progress', 'Done']
+        && data.updatedAt is timestamp;
+    }
+
+    // --- ENTITY RULES ---
+    
+    match /{path=**}/teams/{teamId} {
+      allow list: if isEtharaUser();
+    }
+
+    // USERS
+    match /users/{userId} {
+      allow get: if isEtharaUser();
+      allow list: if isEtharaUser();
+      allow create: if isEtharaUser() && isValidId(userId) && request.auth.uid == userId 
+                     && isValidUser(incoming())
+                     && incoming().email == request.auth.token.email
+                     && incoming().createdAt == request.time;
+      allow update: if isEtharaUser() && (
+                      (request.auth.uid == userId
+                       && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photoURL', 'role'])
+                       && incoming().email == existing().email
+                       && incoming().createdAt == existing().createdAt)
+                      ||
+                      (isSystemAdmin()
+                       && incoming().diff(existing()).affectedKeys().hasOnly(['assignedProjectId', 'role'])
+                       && incoming().email == existing().email
+                       && incoming().createdAt == existing().createdAt)
+                    );
+    }
+
+    // PROJECTS
+    match /projects/{projectId} {
+      allow get: if isValidId(projectId) && isEtharaUser();
+      allow list: if isEtharaUser();
+      allow create: if isSystemAdmin() && isValidId(projectId)
+                     && isValidProject(incoming())
+                     && incoming().ownerId == request.auth.uid
+                     && incoming().createdAt == request.time
+                     && incoming().updatedAt == request.time;
+      allow update: if isSystemAdmin() && isValidId(projectId)
+                     && isValidProject(incoming())
+                     && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'updatedAt'])
+                     && incoming().ownerId == existing().ownerId
+                     && incoming().createdAt == existing().createdAt
+                     && incoming().updatedAt == request.time;
+      allow delete: if isSystemAdmin() && isValidId(projectId);
+
+      // PROJECT TEAMS
+      match /teams/{teamId} {
+        allow get: if isValidId(projectId) && isValidId(teamId) && isEtharaUser();
+        allow list: if isValidId(projectId) && isEtharaUser();
+        allow create: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId)
+                       && isValidTeam(incoming())
+                       && incoming().projectId == projectId
+                       && incoming().createdAt == request.time
+                       && incoming().updatedAt == request.time;
+        allow update: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId)
+                       && isValidTeam(incoming())
+                       && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'updatedAt'])
+                       && incoming().projectId == existing().projectId
+                       && incoming().createdAt == existing().createdAt
+                       && incoming().updatedAt == request.time;
+        allow delete: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId);
+
+        // TEAM MEMBERS
+        match /members/{memberId} {
+          allow get: if isValidId(projectId) && isValidId(teamId) && isValidId(memberId) && isEtharaUser();
+          allow list: if isValidId(projectId) && isValidId(teamId) && isEtharaUser();
+          allow create: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId) && isValidId(memberId)
+                         && isValidTeamMember(incoming())
+                         && incoming().joinedAt == request.time;
+          allow update: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId) && isValidId(memberId)
+                         && isValidTeamMember(incoming())
+                         && incoming().diff(existing()).affectedKeys().hasOnly(['role'])
+                         && incoming().userId == existing().userId
+                         && incoming().joinedAt == existing().joinedAt;
+          allow delete: if isSystemAdmin() && isValidId(projectId) && isValidId(teamId) && isValidId(memberId);
+        }
+      }
+
+      // PROJECT TASKS
+      match /tasks/{taskId} {
+        allow get: if isValidId(projectId) && isValidId(taskId) && isEtharaUser() && (isSystemAdmin() || isProjectMember(projectId));
+        allow list: if isValidId(projectId) && isEtharaUser() && (isSystemAdmin() || isProjectMember(projectId));
+        
+        allow create: if isSystemAdmin() && isValidId(projectId) && isValidId(taskId)
+                       && isValidTask(incoming())
+                       && incoming().projectId == projectId
+                       && incoming().createdAt == request.time
+                       && incoming().updatedAt == request.time;
+        allow update: if isEtharaUser() && isValidId(projectId) && isValidId(taskId) && (
+                        (isSystemAdmin() && incoming().get('updatedAt', null) == request.time)
+                        ||
+                        (isProjectMember(projectId) 
+                         && existing().get('assigneeId', '') == request.auth.uid
+                         && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+                         && (incoming().status in ['To Do', 'In Progress', 'Done'])
+                         && incoming().updatedAt == request.time)
+                      );
+        allow delete: if isSystemAdmin() && isValidId(projectId) && isValidId(taskId);
+      }
+    }
+  }
+}
