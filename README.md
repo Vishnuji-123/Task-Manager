@@ -1,165 +1,226 @@
-# Ethara Tasks
+<div align="center">
 
-> The internal task management platform for **Ethara.ai** — built for teams that move fast and need structure.
+<br />
 
-Ethara Tasks is a full-stack web application that brings projects, teams, and tasks into a single, unified workspace. Access is restricted exclusively to `@ethara.ai` company accounts, with role-based permissions ensuring everyone sees exactly what they need.
+```
+███████╗████████╗██╗  ██╗ █████╗ ██████╗  █████╗
+██╔════╝╚══██╔══╝██║  ██║██╔══██╗██╔══██╗██╔══██╗
+█████╗     ██║   ███████║███████║██████╔╝███████║
+██╔══╝     ██║   ██╔══██║██╔══██║██╔══██╗██╔══██║
+███████╗   ██║   ██║  ██║██║  ██║██║  ██║██║  ██║
+╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
+                T  A  S  K  S
+```
 
----
+**The internal task management platform for [Ethara.ai](https://ethara.ai)**
+*Built for teams that move fast and need structure.*
 
-## Table of Contents
+<br />
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Firebase Setup](#firebase-setup)
-- [Authentication & Access Control](#authentication--access-control)
-- [Roles & Permissions](#roles--permissions)
-- [Environment Variables](#environment-variables)
-- [Scripts](#scripts)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/License-Internal%20Only-red?style=flat-square)
 
----
+<br />
 
-## Features
+![Access](https://img.shields.io/badge/%40ethara.ai-restricted%20access-gold?style=flat-square&logo=google&logoColor=white)
+![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat-square)
+![Auth](https://img.shields.io/badge/auth-Google%20OAuth-4285F4?style=flat-square&logo=google&logoColor=white)
 
-### Authentication
-- **Google Sign-In** via Firebase Authentication with `signInWithPopup`
-- **Domain enforcement** — only `@ethara.ai` accounts can log in; all others are signed out immediately with a clear error message
-- **Onboarding flow** — first-time users pick their role (Admin or Member) before accessing the dashboard
-
-### Role-Based Access
-- Two top-level roles: **Admin** and **Member**, selected once during onboarding
-- Five team-level roles assignable per member: **Tasker**, **Quality Reviewer (QR)**, **Quality Lead (QL)**, **Project Lead (PL)**, and **Admin**
-- Admins see the full workspace; Members see only their assigned project and teams
-
-### Admin Dashboard
-- Overview stats: total active projects and total teams
-- Create new projects with a title and description
-- Navigate into any project to manage it in depth
-
-### Project Management
-- **Overview tab** — at-a-glance stats: total teams, assigned members, total tasks, and completed tasks
-- **Teams tab** — list all teams in the project; create new teams with a name, description, and pre-selected members
-- Member assignment is scoped — users already assigned to another project are excluded from the picker
-
-### Team Management
-- Edit team title and description inline
-- **Members tab** — full member list with role management; add new members via a searchable picker; remove members from the team
-- **Task Board tab** — a three-column Kanban board (To Do / In Progress / Done) with task count badges per column
-
-### Task Management
-- Create tasks with: title, description, priority level, due date, and assignee
-- **Priority levels**: Low, Medium, High, Urgent — each with a distinct colour badge
-- Edit or delete tasks inline directly from the Kanban board (Admin only)
-- Members can update their own task status (To Do → In Progress → Done) from their personal dashboard
-
-### Member Dashboard
-- Personal stats: tasks to do, completed tasks, and upcoming deadlines
-- View assigned project and all teams the member belongs to
-- Full table of assigned tasks with status selector, priority badge, and due date
-- Navigate directly into any assigned team
-
-### Real-Time Updates
-- All project, team, task, and member lists use **Firestore real-time subscriptions** (`onSnapshot`) — changes appear instantly without page refresh
-
-### Animated UI
-- Smooth entrance and scroll animations powered by **Motion (Framer Motion)**
-- Responsive layout across mobile, tablet, and desktop
+</div>
 
 ---
 
-## Tech Stack
+## 📌 What is this?
 
-| Layer | Technology |
+Ethara Tasks is a **full-stack internal workspace** that brings projects, teams, and tasks into one unified platform.
+
+> 🔒 Access is restricted exclusively to `@ethara.ai` company accounts.
+> Role-based permissions ensure everyone sees exactly what they need — nothing more.
+
+---
+
+## 📋 Table of Contents
+
+- [✨ Features](#-features)
+- [🛠 Tech Stack](#-tech-stack)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Getting Started](#-getting-started)
+- [🔥 Firebase Setup](#-firebase-setup)
+- [🔐 Authentication](#-authentication--access-control)
+- [🎭 Roles & Permissions](#-roles--permissions)
+- [⚙️ Environment Variables](#%EF%B8%8F-environment-variables)
+- [📦 Scripts](#-scripts)
+
+---
+
+## ✨ Features
+
+<details>
+<summary><b>🔐 Authentication & Access Control</b></summary>
+<br />
+
+| Feature | Details |
 |---|---|
-| Frontend | React 19, TypeScript, Vite 6 |
-| Routing | React Router v7 |
-| Styling | Tailwind CSS v4 |
-| Animation | Motion (Framer Motion) |
-| Icons | Lucide React |
-| Backend / DB | Firebase Firestore |
-| Auth | Firebase Authentication (Google OAuth) |
-| Date Formatting | date-fns |
-| AI SDK | @google/genai |
+| **Google Sign-In** | Firebase Auth via `signInWithPopup` |
+| **Domain Gate** | Non `@ethara.ai` accounts are signed out instantly |
+| **Onboarding Flow** | First-time users pick Admin or Member before entering |
+| **Account Hint** | Google picker pre-filtered with `hd: 'ethara.ai'` |
+
+</details>
+
+<details>
+<summary><b>🛡 Admin Dashboard</b></summary>
+<br />
+
+| Feature | Details |
+|---|---|
+| **Overview Stats** | Total active projects and teams at a glance |
+| **Project Creation** | Create projects with title and description |
+| **Team Management** | Create teams, assign members, manage team-level roles |
+| **Inline Editing** | Edit team title and description without modals |
+| **Member Scoping** | Members already in another project are excluded from pickers |
+
+</details>
+
+<details>
+<summary><b>🧑‍💻 Member Dashboard</b></summary>
+<br />
+
+| Feature | Details |
+|---|---|
+| **Personal Stats** | Tasks to do, completed, and upcoming deadlines |
+| **Task Table** | Full list of assigned tasks with status, priority, and due date |
+| **Status Updates** | Move tasks: `To Do → In Progress → Done` |
+| **Team Navigation** | Jump directly to any assigned team's board |
+
+</details>
+
+<details>
+<summary><b>📌 Task Management</b></summary>
+<br />
+
+| Feature | Details |
+|---|---|
+| **Task Fields** | Title, description, priority, due date, assignee |
+| **Priority Levels** | `Low` `Medium` `High` `Urgent` — each with a distinct colour badge |
+| **Kanban Board** | Three-column board: **To Do / In Progress / Done** |
+| **Admin Controls** | Edit and delete tasks inline (Admin only) |
+
+</details>
+
+<details>
+<summary><b>⚡ Real-Time Updates</b></summary>
+<br />
+
+Everything uses **Firestore `onSnapshot` subscriptions** — changes appear instantly across all connected clients, with zero polling or page refresh required.
+
+- ✅ Live project list
+- ✅ Live task board
+- ✅ Live member lists
+- ✅ Live team updates
+
+</details>
 
 ---
 
-## Project Structure
+## 🛠 Tech Stack
+
+| Layer | Technology | Version |
+|---|---|---|
+| **Frontend** | React + TypeScript | `19` |
+| **Bundler** | Vite | `6` |
+| **Routing** | React Router | `v7` |
+| **Styling** | Tailwind CSS | `v4` |
+| **Animation** | Motion (Framer Motion) | latest |
+| **Icons** | Lucide React | latest |
+| **Database** | Firebase Firestore | realtime |
+| **Auth** | Firebase Auth — Google OAuth | — |
+| **Dates** | date-fns | — |
+| **AI SDK** | @google/genai | — |
+
+---
+
+## 📁 Project Structure
 
 ```
 src/
 ├── contexts/
-│   └── AuthContext.tsx       # Auth state, Google sign-in, domain enforcement, role management
+│   └── AuthContext.tsx        # Auth state, domain enforcement, role management
+│
 ├── lib/
-│   ├── firebase.ts           # Firebase app initialisation
-│   ├── db.ts                 # All Firestore read/write helpers and subscriptions
-│   └── utils.ts              # Shared utility functions
+│   ├── firebase.ts            # Firebase app initialisation
+│   ├── db.ts                  # All Firestore read/write helpers + subscriptions
+│   └── utils.ts               # Shared utilities
+│
 ├── pages/
-│   ├── LandingPage.tsx       # Public marketing page with sign-in CTA
-│   ├── Onboarding.tsx        # First-login role selection screen
-│   ├── Dashboard.tsx         # Role-aware dashboard router
-│   ├── AdminDashboard.tsx    # Admin home — projects overview and creation
-│   ├── MemberDashboard.tsx   # Member home — personal tasks and team view
-│   ├── ProjectDetails.tsx    # Project overview and team management
-│   └── TeamDetails.tsx       # Team members, Kanban board, task CRUD
+│   ├── LandingPage.tsx        # Public marketing page with sign-in CTA
+│   ├── Onboarding.tsx         # First-login role selection screen
+│   ├── Dashboard.tsx          # Role-aware dashboard router
+│   ├── AdminDashboard.tsx     # Admin home — projects overview and creation
+│   ├── MemberDashboard.tsx    # Member home — personal tasks and teams
+│   ├── ProjectDetails.tsx     # Project overview + team management tabs
+│   └── TeamDetails.tsx        # Team members + Kanban board + task CRUD
+│
 ├── components/
 │   └── layout/
 │       ├── Navbar.tsx
 │       └── Footer.tsx
-├── App.tsx                   # Route definitions
-└── main.tsx                  # Entry point
+│
+├── App.tsx                    # Route definitions
+└── main.tsx                   # Entry point
 ```
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- A Firebase project (see [Firebase Setup](#firebase-setup) below)
+- **Node.js** `18+`
+- A configured **Firebase project** *(see [Firebase Setup](#-firebase-setup) below)*
 
 ### Installation
 
 ```bash
-# Clone the repo
+# 1. Clone the repository
 git clone https://github.com/your-org/ethara-tasks.git
 cd ethara-tasks
 
-# Install dependencies
+# 2. Install dependencies
 npm install
-```
 
-### Running Locally
+# 3. Add your Firebase config (see below)
 
-```bash
+# 4. Start the dev server
 npm run dev
+# → http://localhost:3000
 ```
-
-The app runs on `http://localhost:3000` by default.
 
 ---
 
-## Firebase Setup
+## 🔥 Firebase Setup
 
-### 1. Create a Firebase project
+### Step 1 — Create a Firebase project
 
-Go to [Firebase Console](https://console.firebase.google.com/), create a project, and enable:
-- **Authentication** → Sign-in method → **Google**
-- **Firestore Database** → Start in production mode
+Go to [console.firebase.google.com](https://console.firebase.google.com/) and enable:
 
-### 2. Add `localhost` to Authorized Domains
+- ☑️ **Authentication** → Sign-in method → **Google**
+- ☑️ **Firestore Database** → Start in **production mode**
 
-This is required for Google sign-in to work locally:
+### Step 2 — Add `localhost` to Authorized Domains
 
-1. Firebase Console → **Authentication** → **Settings** → **Authorized domains**
-2. Click **Add domain** → enter `localhost` → Save
+> **Authentication → Settings → Authorized domains → Add domain → `localhost`**
 
-> Without this step, the Google sign-in popup will open and immediately close with no error.
+> [!WARNING]
+> Without this step, the Google sign-in popup opens and **immediately closes with no error**. This is the most common setup issue.
 
-### 3. Add your Firebase config
+### Step 3 — Create the config file
 
-The app reads Firebase config from `firebase-applet-config.json` in the project root:
+Create `firebase-applet-config.json` in the project root:
 
 ```json
 {
@@ -174,38 +235,47 @@ The app reads Firebase config from `firebase-applet-config.json` in the project 
 }
 ```
 
+> [!CAUTION]
+> Add `firebase-applet-config.json` to `.gitignore`. Never commit API keys to version control.
+
 ---
 
-## Authentication & Access Control
+## 🔐 Authentication & Access Control
 
-Sign-in is done via Google OAuth using `signInWithPopup`. After authentication, the app immediately checks the user's email domain:
+Sign-in uses Google OAuth via `signInWithPopup`. After auth resolves, the domain is checked immediately:
 
 ```ts
+// Domain gate — enforced on every sign-in
 if (!currentUser.email?.endsWith('@ethara.ai')) {
   await signOut(auth);
   alert("Access Restricted: Only @ethara.ai accounts are permitted.");
   return;
 }
+
+// Pre-filter the Google account picker
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ hd: 'ethara.ai' });
 ```
 
-If the domain check fails, the user is signed out instantly. The Google account picker is also hinted with `hd: 'ethara.ai'` so only company accounts are shown by default.
+> [!NOTE]
+> The `hd` parameter is a **hint**, not a hard filter. The domain check in the callback is the actual security boundary.
 
 ---
 
-## Roles & Permissions
+## 🎭 Roles & Permissions
 
-### Top-Level Roles (selected at onboarding)
+### Top-Level Roles *(chosen once at onboarding)*
 
 | Role | Capabilities |
 |---|---|
-| **Admin** | Create projects and teams, manage all members, create/edit/delete tasks, view all dashboards |
-| **Member** | View assigned project and teams, update own task status, navigate to assigned team board |
+| 🛡 **Admin** | Create projects and teams · Manage all members · Create / edit / delete tasks · View all data |
+| 🧑‍💻 **Member** | View assigned project and teams · Update own task status · Navigate team board |
 
-### Team-Level Roles (assigned per team by Admin)
+### Team-Level Roles *(assigned per team by Admin)*
 
 | Role | Description |
 |---|---|
-| **Tasker** | Default role; works on assigned tasks |
+| **Tasker** | Default role — works on assigned tasks |
 | **QR** | Quality Reviewer |
 | **QL** | Quality Lead |
 | **PL** | Project Lead |
@@ -213,25 +283,24 @@ If the domain check fails, the user is signed out instantly. The Google account 
 
 ---
 
-## Environment Variables
+## ⚙️ Environment Variables
 
-This project does not use a `.env` file for Firebase config — the config is loaded from `firebase-applet-config.json` at runtime. If you need to add environment-specific variables, create a `.env` file at the project root:
+Firebase config is read from `firebase-applet-config.json` at runtime — no `.env` required for Firebase.
+
+For any additional variables, create a `.env` file at the project root:
 
 ```env
+# Vite exposes VITE_-prefixed vars via import.meta.env
 VITE_SOME_KEY=your_value
 ```
 
-Vite exposes `VITE_` prefixed variables to the client via `import.meta.env`.
-
 ---
 
----
-
-## Scripts
+## 📦 Scripts
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start development server on port 3000 |
+| `npm run dev` | Start dev server on port `3000` |
 | `npm run build` | Build for production |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run TypeScript type checks |
@@ -239,6 +308,15 @@ Vite exposes `VITE_` prefixed variables to the client via `import.meta.env`.
 
 ---
 
-## License
+<div align="center">
 
-Internal use only. This project is proprietary to **Ethara.ai** and not licensed for public distribution.
+<br />
+
+**Ethara Tasks** is proprietary to **Ethara.ai**
+Internal use only · Not licensed for public distribution
+
+<br />
+
+![footer](https://img.shields.io/badge/%E2%80%94%E2%80%94%E2%80%94%20ETHARA.AI%20%E2%80%94%E2%80%94%E2%80%94-1a1a2e?style=flat-square)
+
+</div>
