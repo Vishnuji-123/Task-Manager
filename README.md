@@ -307,16 +307,3 @@ VITE_SOME_KEY=your_value
 | `npm run clean` | Remove `dist/` and `server.js` |
 
 ---
-
-<div align="center">
-
-<br />
-
-**Ethara Tasks** is proprietary to **Ethara.ai**
-Internal use only · Not licensed for public distribution
-
-<br />
-
-![footer](https://img.shields.io/badge/%E2%80%94%E2%80%94%E2%80%94%20ETHARA.AI%20%E2%80%94%E2%80%94%E2%80%94-1a1a2e?style=flat-square)
-
-</div>
